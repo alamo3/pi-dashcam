@@ -26,7 +26,7 @@ class SettingsManager
       return cachedCount;
     }
 
-    return -1;
+    return 0;
   }
 
   Future<bool> set_camera_count(int num_cameras) async
@@ -43,6 +43,14 @@ class SettingsManager
     bool success = await prefs.setString(_pi_address, address);
 
     return success;
+  }
+
+  Future<String?> get_pi_address() async
+  {
+    final prefs = await SharedPreferences.getInstance();
+    final cacheIp = prefs.getString(_pi_address);
+
+    return cacheIp;
   }
 
   Future<void> delete_cached_preferences() async

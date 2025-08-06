@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:pi_dashcam/settings/settings_manager.dart';
 
+
 class LiveView extends StatefulWidget {
   const LiveView({super.key});
 
@@ -26,7 +27,7 @@ class _LiveViewState extends State<LiveView> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: (_num_of_streams_avail != null) ? Text("Cameras loaded! %d") : Placeholder(),
+      child: (_num_of_streams_avail != null) ? Text("Cameras loaded! $_num_of_streams_avail") : Placeholder(),
     );
   }
 }
