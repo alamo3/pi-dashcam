@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pi_dashcam/settings/settings_manager.dart';
 import 'package:pi_dashcam/live_view/video_tile.dart';
+import 'package:provider/provider.dart';
+
 
 
 class LiveView extends StatefulWidget {
@@ -55,9 +57,9 @@ class _LiveViewState extends State<LiveView> {
     );
   }
 
-  Widget cameraStreamSelectionWidget(BuildContext context)
+  Widget cameraStreamSelectionWidget(BuildContext context, int num_cameras)
   {
-    switch(_num_of_streams_avail)
+    switch(num_cameras)
     {
       case 1:
         {
@@ -74,8 +76,9 @@ class _LiveViewState extends State<LiveView> {
 
   @override
   Widget build(BuildContext context) {
+    final numCameras = context.watch<SettingsManager>().cam_count;
     return Center(
-      child: cameraStreamSelectionWidget(context)
+      child: cameraStreamSelectionWidget(context, numCameras)
     );
   }
 }

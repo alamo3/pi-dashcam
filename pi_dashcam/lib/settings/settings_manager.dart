@@ -1,7 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsManager
+class SettingsManager extends ChangeNotifier
 {
 
   static final SettingsManager _settingsManager = SettingsManager._internal();
@@ -14,10 +15,12 @@ class SettingsManager
   static const String _timestampKey = 'camera_cache_time';
   static const String _pi_address = 'pi_address';
 
+  int cam_count = 0;
+  String pi_address = "";
+
   Future<int> fetch_camera_count() async
   {
     final prefs = await SharedPreferences.getInstance();
-
 
     final cachedCount = prefs.getInt(_camera_count);
 
@@ -34,6 +37,11 @@ class SettingsManager
     final prefs = await SharedPreferences.getInstance();
     bool success = await prefs.setInt(_camera_count, num_cameras);
 
+    if(success)
+    {
+      cam_count = num_cameras;
+      notifyListeners();
+    }
     return success;
   }
 
@@ -41,6 +49,12 @@ class SettingsManager
   {
     final prefs = await SharedPreferences.getInstance();
     bool success = await prefs.setString(_pi_address, address);
+
+    if(success)
+    {
+      pi_address = address;
+      notifyListeners();
+    }
 
     return success;
   }
@@ -59,6 +73,8 @@ class SettingsManager
 
     prefs.remove(_camera_count);
     prefs.remove(_pi_address);
+
+    notifyListeners();
   }
 
 }

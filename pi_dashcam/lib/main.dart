@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:pi_dashcam/live_view/live_view.dart';
+import 'package:pi_dashcam/settings/settings_manager.dart';
 import 'package:pi_dashcam/settings/settings_page.dart';
+import 'package:provider/provider.dart';
+
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (_) => SettingsManager(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

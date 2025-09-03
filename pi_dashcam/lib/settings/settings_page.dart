@@ -37,8 +37,8 @@ class _SettingsMenuState extends State<SettingsMenu> {
 
   Future<Map<String,dynamic>> fetchData() async {
     try {
-      final response = await http.get(
-          Uri.parse("http://$host_ip:5000/camera_count"));
+      final response = await Future.value(http.get(
+          Uri.parse("http://$host_ip:5000/camera_count"))).timeout(Duration(seconds: 10)) ;
 
       if (response.statusCode == 200) {
         // Request successful, parse the JSON response
@@ -48,7 +48,6 @@ class _SettingsMenuState extends State<SettingsMenu> {
       }
       else {
         // Request failed
-
         return {};
       }
     }catch(e)
@@ -76,6 +75,7 @@ class _SettingsMenuState extends State<SettingsMenu> {
         setState(() {
           host_ip = ip;
           _controller.text = ip;
+          is_ip_valid = true;
         });
       }
 
@@ -133,6 +133,7 @@ class _SettingsMenuState extends State<SettingsMenu> {
                         );
                         setState(() {
                           num_cameras = 0;
+                          SettingsManager().set_camera_count(num_cameras);
                         });
                       }
                       else
@@ -151,7 +152,10 @@ class _SettingsMenuState extends State<SettingsMenu> {
             ElevatedButton(onPressed: (){
               if(!is_ip_valid)
               {
-
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Please enter a valid IP or Hostname'),
+                        duration: Duration(seconds: 4))
+                );
               }
               else
               {
