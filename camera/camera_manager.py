@@ -19,15 +19,19 @@ class CameraManager:
 
             if camera_source_test.ok:
                 self.cameras.append(camera_source_test)
+                print("Detected camera at index ", i)
 
 
     def get_num_cameras(self):
         return len(self.cameras)
 
     def add_camera_routes(self, app):
-
+        i = 0
         for cam in self.cameras:
+            cam.set_actual_stream_id(i)
             cam.add_app_route(app)
+            print("Added route for camera ", cam.camera_id, "at index ", i)
+            i = i + 1
 
     def start_recording(self, cam_id):
         for cam in self.cameras:

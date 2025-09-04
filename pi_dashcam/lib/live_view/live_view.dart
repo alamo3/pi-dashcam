@@ -49,21 +49,28 @@ class _LiveViewState extends State<LiveView> {
 
   }
 
-  Widget singleCameraAvailable(BuildContext context)
+  Widget cameraAvailableWidget(BuildContext context, int numCameras)
   {
     return Center(
-      child:
-        VideoTile(cameraId: 0, onTap: () => _startAndOpenStream(context, 0)),
+      child: Column(
+        children: [
+          for(int i = 0; i < numCameras; i++)
+              VideoTile(cameraId: i, onTap: () => _startAndOpenStream(context, i))
+        ],
+      ),
     );
   }
 
-  Widget cameraStreamSelectionWidget(BuildContext context, int num_cameras)
+  Widget cameraStreamSelectionWidget(BuildContext context, int numCameras)
   {
-    switch(num_cameras)
+    switch(numCameras)
     {
       case 1:
+      case 2:
+      case 3:
+      case 4:
         {
-          return singleCameraAvailable(context);
+          return cameraAvailableWidget(context, numCameras);
         }
 
       default:
@@ -77,6 +84,7 @@ class _LiveViewState extends State<LiveView> {
   @override
   Widget build(BuildContext context) {
     final numCameras = context.watch<SettingsManager>().cam_count;
+    final _ = context.watch<SettingsManager>().pi_address;
     return Center(
       child: cameraStreamSelectionWidget(context, numCameras)
     );

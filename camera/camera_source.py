@@ -1,3 +1,5 @@
+import platform
+
 import cv2
 import time
 import threading
@@ -13,11 +15,21 @@ class CameraSource:
         base_dir:       Parent directory for recordings
         max_dir_bytes:  Per-camera max size budget (bytes)
         """
+
+        system = platform.system()
+        backend = 0
+
+        if system == "Windows":
+            backend = cv2.CAP_DSHOW
+        elif system == "Linux":
+            backend = cv2.CAP_V4L2
+
         self.camera_id = camera_id
-        self.cap = cv2.VideoCapture(camera_id)
+        self.cap = cv2.VideoCapture(camera_id, backend)
         self.ok = self.cap.isOpened()
 
         if self.ok:
+            self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, res_x)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, res_y)
             self.cap.set(cv2.CAP_PROP_FPS, fps)
@@ -50,7 +62,7 @@ class CameraSource:
         self.base_dir = Path(base_dir)
         self.max_dir_bytes = int(max_dir_bytes)
         self._cam_dir = self.base_dir / f"cam_{self.camera_id}"
-        self._cam_dir.mkdir(parents=True, exist_ok=True)
+
         self._file_prefix = f"cam{self.camera_id}_"
 
         # NEW: rotation timing
@@ -58,7 +70,12 @@ class CameraSource:
         self._segment_end_dt = None            # datetime for 60s boundary
 
         if self.ok:
+            self._cam_dir.mkdir(parents=True, exist_ok=True)
             self._start_producer()
+
+        self.actual_stream_id = -1
+
+
 
     def _safe_fps(self, requested):
         got = self.cap.get(cv2.CAP_PROP_FPS)
@@ -293,6 +310,9 @@ class CameraSource:
         finally:
             self._unregister_stream_client()
 
+    def set_actual_stream_id(self, stream_id):
+        self.actual_stream_id = stream_id
+
     def make_stream_route(self):
         def stream():
             return Response(self._stream_generator(),
@@ -300,8 +320,8 @@ class CameraSource:
         return stream
 
     def add_app_route(self, app):
-        route = f"/stream/{self.camera_id}"
-        app.add_url_rule(route, f'stream_{self.camera_id}', self.make_stream_route())
+        route = f"/stream/{self.actual_stream_id}"
+        app.add_url_rule(route, f'stream_{self.actual_stream_id}', self.make_stream_route())
 
     # ---------------- Cleanup ----------------
     def release(self):
