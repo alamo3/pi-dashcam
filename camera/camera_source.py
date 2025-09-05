@@ -29,7 +29,7 @@ class CameraSource:
         self.ok = self.cap.isOpened()
 
         if self.ok:
-            self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+            #self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, res_x)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, res_y)
             self.cap.set(cv2.CAP_PROP_FPS, fps)
